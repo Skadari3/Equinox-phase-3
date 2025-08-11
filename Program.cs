@@ -1,24 +1,16 @@
-/*using Equinox.Models;
+using Equinox.Models.DataLayer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Use connection string from appsettings.json
-builder.Services.AddDbContext<EquinoxContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddSession();
+builder.Services.AddDbContext<EquinoxContext>(options =>
+    options.UseSqlite("Data Source=Equinox.db"));
+
 builder.Services.AddControllersWithViews();
+builder.Services.AddSession();
 
 var app = builder.Build();
-
-// Automatically apply migrations and create database
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<EquinoxContext>();
-    db.Database.Migrate();
-}
 
 app.UseStaticFiles();
 app.UseRouting();
@@ -34,49 +26,4 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.Run();*/
-
-
-
-using Equinox.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Sqlite;
-
-var builder = WebApplication.CreateBuilder(args);
-var dbPath = builder.Environment.IsDevelopment()
-    ? "Data Source=Equinox.db"
-    : "Data Source=D:\\home\\data\\Equinox.db";
-
-builder.Services.AddDbContext<EquinoxContext>(options =>
-    options.UseSqlite(dbPath));
-
-//builder.Services.AddDbContext<EquinoxContext>(options =>
-//options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
-// options.UseSqlite("Data Source=Equinox.db"));
-
-builder.Services.AddSession();
-builder.Services.AddControllersWithViews();
-
-var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<EquinoxContext>();
-    db.Database.Migrate();  // You can replace with EnsureCreated() if you're not using migrations
-}
-app.UseStaticFiles();
-app.UseRouting();
-app.UseSession();
-app.UseAuthorization();
-
-app.MapAreaControllerRoute(
-    name: "admin",
-    areaName: "Admin",
-    pattern: "Admin/{controller=Home}/{action=Index}/{id?}");
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 app.Run();
